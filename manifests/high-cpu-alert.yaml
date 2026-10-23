@@ -1,0 +1,22 @@
+# TEMPLATE: requires Prometheus Operator CRDs and a matching rule selector.
+# Validate metric names/labels and tune the threshold for your cluster.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kubernetes-lab-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: kubernetes-lab.rules
+      rules:
+        - alert: HighNodeCPU
+          expr: |
+            (1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))) * 100 > 85
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High CPU utilization on node {{ $labels.instance }}"
+            description: "CPU utilization has remained above 85% for 5 minutes."
