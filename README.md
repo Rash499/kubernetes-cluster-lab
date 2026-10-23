@@ -1,6 +1,6 @@
 # Kubernetes Cluster Lab — Build, Networking, Security & Automation
 
-A hands-on Kubernetes administration lab built on VMware with three Debian 13 virtual machines. This repository documents the architecture, concepts, YAML manifests, commands, validation and troubleshooting.
+A hands-on Kubernetes administration lab built on VMware with three Debian 13 virtual machines. This repository consolidates the Notion lab record into concepts, commands, reusable YAML, troubleshooting guides and architecture diagrams.
 
 ## Architecture
 
@@ -19,11 +19,13 @@ flowchart TB
     K1 --> CNI["CNI networking"]
     K2 --> CNI
     CNI --> Pods["Pod CIDR 10.244.0.0/16"]
-    Pods --> Services["Services / EndpointSlices"]
+    Pods --> Svc["ClusterIP / NodePort / LoadBalancer"]
+    Svc --> EPS["EndpointSlices → Pods"]
     Pods --> DNS["CoreDNS"]
-    API --> Sec["Pod Security Admission / RBAC"]
-    Ansible["Ansible controller"] -. "SSH automation work" .-> W1
-    Ansible -. "SSH automation work" .-> W2
+    API --> Sec["Pod Security / RBAC"]
+    Pods --> Metrics["Prometheus / Grafana"]
+    Ansible["Ansible controller"] -. "automation workflow to verify" .-> W1
+    Ansible -. "automation workflow to verify" .-> W2
 ```
 
 ### Recorded node inventory
@@ -34,57 +36,73 @@ flowchart TB
 | `k8s-worker1` | `192.168.6.139` | Worker |
 | `k8s-worker2` | `192.168.6.140` | Worker |
 
-Recorded settings: network `192.168.6.0/24`, gateway/DNS `192.168.6.2`, interface `ens33`, Kubernetes `v1.34.12`, containerd `1.7.24`, Pod CIDR `10.244.0.0/16`. One note says the addresses were DHCP-assigned, so verify live addressing before describing them as static.
+Recorded settings: network `192.168.6.0/24`, gateway/DNS `192.168.6.2`, interface `ens33`, Kubernetes `v1.34.12`, containerd `1.7.24`, Pod CIDR `10.244.0.0/16`. The Notion notes say node addresses are DHCP-assigned, not statically configured.
 
-## Repository guide
+## Documentation index
 
-| Directory | Contents |
+| Directory | Topics |
 |---|---|
-| [01-infrastructure](01-infrastructure/README.md) | VMware, Debian VMs, addressing and SSH |
-| [02-linux-prerequisites](02-linux-prerequisites/README.md) | Swap, kernel modules, sysctl and networking |
-| [03-container-runtime](03-container-runtime/README.md) | containerd, CRI, systemd cgroups and CNI paths |
-| [04-kubernetes-installation](04-kubernetes-installation/README.md) | APT repository, kubeadm, kubelet, kubectl and initialization |
-| [05-cluster-networking](05-cluster-networking/README.md) | Pod CIDR, CNI history, Flannel/Calico and connectivity |
-| [06-workloads-and-services](06-workloads-and-services/README.md) | Pods, Deployments, Services, EndpointSlices and DNS |
+| [01-infrastructure](01-infrastructure/README.md) | VMware, Debian VMs, users, hostnames, addressing and SSH |
+| [02-linux-prerequisites](02-linux-prerequisites/README.md) | Swap, kernel modules, sysctl and packet forwarding |
+| [03-container-runtime](03-container-runtime/README.md) | containerd, CRI, systemd cgroups and CNI binary paths |
+| [04-kubernetes-installation](04-kubernetes-installation/README.md) | APT repository, kubeadm, kubelet, kubectl, init and worker join |
+| [05-cluster-networking](05-cluster-networking/README.md) | Pod CIDR, Flannel-to-Calico history, Pod connectivity and DNS |
+| [06-workloads-and-services](06-workloads-and-services/README.md) | Pods, Deployments, Services, EndpointSlices, CoreDNS |
 | [07-configuration-and-secrets](07-configuration-and-secrets/README.md) | ConfigMaps and Secrets |
-| [08-persistent-storage](08-persistent-storage/README.md) | PV/PVC and hostPath persistence |
-| [09-ingress](09-ingress/README.md) | HTTP routing and Ingress Controller |
-| [10-security-and-rbac](10-security-and-rbac/README.md) | Pod Security, RBAC and NetworkPolicy |
-| [11-automation-ansible](11-automation-ansible/README.md) | Ansible inventory and worker automation pattern |
-| [12-troubleshooting](12-troubleshooting/README.md) | Troubleshooting cases |
-| [13-validation-and-interview](13-validation-and-interview/README.md) | Validation checklist and interview summary |
-| [manifests](manifests/README.md) | Reusable YAML examples and concept explanations |
-| [diagrams](diagrams/README.md) | Mermaid architecture diagrams |
-| [SOURCES.md](SOURCES.md) | Related Notion notes and accuracy caveats |
+| [08-persistent-storage](08-persistent-storage/README.md) | PV/PVC, hostPath and StatefulSet storage concepts |
+| [09-ingress](09-ingress/README.md) | ingress-nginx, path and host-based routing |
+| [10-security-and-rbac](10-security-and-rbac/README.md) | Pod Security Admission, RBAC, ClusterRole and NetworkPolicy |
+| [11-automation-ansible](11-automation-ansible/README.md) | Ansible inventory and worker automation workflow |
+| [12-troubleshooting](12-troubleshooting/README.md) | Runtime, CNI, DNS, Pod, Service and access troubleshooting |
+| [13-validation-and-interview](13-validation-and-interview/README.md) | Verification checklist and interview summaries |
+| [14-observability](14-observability/README.md) | Prometheus, Grafana, PromQL, PrometheusRule and Alertmanager |
+| [15-scaling-and-resources](15-scaling-and-resources/README.md) | Metrics Server, HPA, resource requests/limits, QoS and OOM |
+| [16-helm](16-helm/README.md) | Charts, templates, values, install, upgrade, rollback and uninstall |
+| [17-service-types-and-networking](17-service-types-and-networking/README.md) | ClusterIP, NodePort, LoadBalancer, kube-proxy, iptables and MetalLB |
+| [18-workload-controllers-and-probes](18-workload-controllers-and-probes/README.md) | StatefulSets, DaemonSets, Jobs, CronJobs, probes, taints/tolerations |
+| [manifests](manifests/README.md) | Reusable Kubernetes YAML examples |
+| [charts/web-demo](charts/web-demo/Chart.yaml) | Small illustrative Helm chart |
+| [diagrams](diagrams/README.md) | Mermaid diagrams |
+| [SOURCES.md](SOURCES.md) | Notion source pages and accuracy notes |
 
-## Core concepts
+## What the lab covered
 
-- **Control plane:** the API server is the entry point; etcd stores cluster state; the scheduler selects nodes for unscheduled Pods; controllers reconcile actual state toward desired state.
-- **Worker node:** kubelet communicates with the API server and manages Pods; containerd runs containers; the CNI plugin provides Pod networking.
-- **Declarative YAML:** you describe the desired state in manifests. `kubectl apply` submits it to the API; controllers continuously work to reconcile the cluster.
-- **Pod / Deployment:** a Pod is the unit Kubernetes schedules. A Deployment manages ReplicaSets and replaces failed or outdated replicas.
-- **Service / EndpointSlice / DNS:** a Service provides a stable virtual address; EndpointSlices list eligible backends; CoreDNS makes service names discoverable.
-- **Storage:** a PVC requests storage and binds to a PV. Node-local `hostPath` data can persist across Pod recreation but is not resilient if the node or its disk fails.
-- **Security:** RBAC governs API permissions, Pod security controls constrain container behavior, and NetworkPolicy can restrict Pod traffic when the CNI enforces it.
+### Cluster foundation
+- Created three Debian 13 VMs in VMware, configured Linux users, hostnames, `/etc/hosts`, swap, kernel modules and sysctl networking.
+- Installed containerd 1.7.24 and fixed its CRI configuration, including `SystemdCgroup = true`.
+- Installed Kubernetes v1.34.12 components, initialized the control plane with kubeadm, configured kubectl and joined both workers.
+- Troubleshot the CNI binary path mismatch (`/usr/lib/cni` versus `/opt/cni/bin`).
 
-## Work covered
+### Workloads, networking and storage
+- Deployed Nginx and a three-replica Python HTTP test application.
+- Tested ClusterIP Services, EndpointSlices, CoreDNS service discovery, Pod IP connectivity and cross-node traffic.
+- Practised ConfigMaps, Secret references, PV/PVC persistence, Ingress path and host routing.
+- Deep-dived into kube-proxy iptables chains, NodePort cross-node routing and LoadBalancer behavior using MetalLB Layer 2 mode.
+- Practised NetworkPolicy isolation and Calico-related networking.
 
-- Built a three-node kubeadm cluster using containerd and configured Linux prerequisites.
-- Installed CNI networking and investigated plugin-path errors.
-- Deployed Nginx and a Python HTTP test workload; checked Services, EndpointSlices, CoreDNS and cross-node Pod connectivity.
-- Practiced ConfigMaps, Secrets, PV/PVC, Ingress, Pod Security Admission, RBAC and NetworkPolicy.
-- Documented a planned Ansible workflow for repeatable worker preparation.
+### Operations, delivery and scaling
+- Created Helm charts, rendered templates, installed releases, changed values, upgraded, rolled back and uninstalled releases.
+- Worked with Prometheus/Grafana dashboards, PromQL, alert rules and Alertmanager concepts.
+- Installed Metrics Server, used `kubectl top`, tested HPA scale-up/scale-down, and explored resource requests, limits, QoS and OOM behavior.
+- Documented StatefulSets, DaemonSets, Jobs, CronJobs, liveness/readiness/startup probes, taints/tolerations and node selection.
+- Tested namespace-scoped RBAC, ClusterRole/ClusterRoleBinding and allowed/denied actions.
 
-## YAML manifests
+## YAML and Helm examples
 
-Start with [manifests/README.md](manifests/README.md). The examples include Namespace, Deployment, Service, ConfigMap, Secret template, restricted Pod, PV/PVC, NetworkPolicy, RBAC and Ingress. They are learning examples, not proof that each object is currently deployed. Review environment-specific assumptions before applying.
+Start with [manifests/README.md](manifests/README.md). Examples cover Deployments, Services, ConfigMaps, a Secret template, restricted Pod settings, PV/PVC, NetworkPolicy, RBAC, Ingress, probes, HPA, resource limits, PrometheusRule, StatefulSet, DaemonSet, Job/CronJob and scheduling tolerations. A minimal Helm chart lives in [charts/web-demo](charts/web-demo/Chart.yaml).
 
-## CNI history and safety
+**Do not apply every file at once.** Some manifests require CRDs, a specific CNI, Metrics Server, a Prometheus Operator, a default StorageClass, an Ingress Controller, MetalLB, a node label/taint, or a prepared local storage path. Read the manifest README and each file's comments first.
 
-The earlier setup used **Flannel**. Later Notion notes describe migration to **Calico v3.33.0** and NetworkPolicy exercises. These are historical stages, not an assertion that both CNI plugins are active. Verify the current cluster before changing anything.
+## Accuracy and safety
 
-Never commit kubeconfig files, join tokens, private SSH keys, passwords or real Secret values. Base64 is encoding, not encryption. `hostPath` is a node-local lab approach, not production-grade storage. Ansible automation remains a workflow to verify rather than a claimed completed deployment.
+- The early CNI was Flannel. Later notes describe a migration to Calico v3.33.0. Verify the active CNI before changing anything; do not install both based only on this history.
+- MetalLB pool `192.168.6.200-192.168.6.210` and service IPs are recorded lab values. Confirm they remain reserved and unused before reusing.
+- Notion records node addresses as DHCP, not static.
+- Ansible is documented as a workflow to verify, not a claim that all worker configuration was successfully automated.
+- Lab YAML files are educational templates, not proof every object remains deployed.
+- Never commit kubeconfig files, join tokens, private SSH keys, passwords or real Secret values.
+- Base64 is encoding, not encryption. `hostPath` is node-local and not production-grade resilient storage.
 
 ## Sources
 
-See [SOURCES.md](SOURCES.md) for the related Notion Kubernetes Setup notes.
+See [SOURCES.md](SOURCES.md) for links to the Notion lab notes, including the Services and Networking deep dives.
