@@ -1,0 +1,20 @@
+# Apply only after reviewing intended traffic and confirming CNI enforcement.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-nginx-from-demo-clients
+  namespace: k8s-demo
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: nginx
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              access-nginx: "true"
+      ports:
+        - protocol: TCP
+          port: 80
