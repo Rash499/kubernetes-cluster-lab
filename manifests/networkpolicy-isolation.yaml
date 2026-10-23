@@ -1,0 +1,34 @@
+# Demonstration policies for a dedicated namespace.
+# Apply only after creating server/client Pods with matching labels and verifying
+# that the installed CNI enforces NetworkPolicy. A default deny may disrupt traffic.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-server-ingress
+  namespace: k8s-demo
+spec:
+  podSelector:
+    matchLabels:
+      app: policy-server
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-labelled-client
+  namespace: k8s-demo
+spec:
+  podSelector:
+    matchLabels:
+      app: policy-server
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              access: allowed
+      ports:
+        - protocol: TCP
+          port: 8080
