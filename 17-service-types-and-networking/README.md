@@ -38,7 +38,7 @@ flowchart TB
   Service --> Pods["Ready Pod endpoints"]
 ```
 
-MetalLB handles IP allocation/advertisement; it does not replace the Kubernetes Service dataplane. In Layer 2 mode, eligible speakers advertise the VIP on the local network (IPv4 ARP). Ensure the pool is reserved and not used by DHCP or other devices.
+MetalLB handles IP allocation/advertisement; it does not replace the Kubernetes Service dataplane. In Layer 2 mode, eligible speakers advertise the VIP on the local network using IPv4 ARP. Ensure the pool is reserved and not used by DHCP or other devices.
 
 ## Useful commands
 
@@ -52,7 +52,26 @@ sudo iptables -t nat -L KUBE-NODEPORTS -n -v
 ip neigh show
 ```
 
-Kube-proxy mode and chains depend on the cluster. Do not assume iptables chain names exist in clusters using another dataplane or proxy mode.
+Notion recorded installation using MetalLB v0.15.3. **Only install if MetalLB is not already present and you intend to configure it**:
+```bash
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.15.3/config/manifests/metallb-native.yaml
+kubectl get pods -n metallb-system
+```
+
+The repository includes [metallb-l2-pool.yaml](../manifests/metallb-l2-pool.yaml). It uses the historical pool `192.168.6.200-192.168.6.210`; check that these IPs are reserved and unused before applying. Apply only after MetalLB CRDs exist:
+```bash
+kubectl apply -f manifests/metallb-l2-pool.yaml
+kubectl get ipaddresspools,l2advertisements -n metallb-system
+```
+
+The lab converted an existing test Service to LoadBalancer with:
+```bash
+kubectl patch svc svc-lb-test-service -p '{"spec":{"type":"LoadBalancer"}}'
+kubectl get svc svc-lb-test-service -w
+```
+Use the actual Service name in your cluster, not the historical name blindly.
+
+Kube-proxy mode and chains depend on cluster configuration. Do not assume iptables chain names exist in clusters using another dataplane or proxy mode.
 
 ## Troubleshooting
 
