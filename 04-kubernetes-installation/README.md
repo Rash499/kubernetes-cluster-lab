@@ -21,8 +21,9 @@ sudo apt-mark hold kubelet kubeadm kubectl
 ```
 
 ## Initialize control plane (new cluster only)
+Replace the masked node address with the control plane's actual address before running:
 ```bash
-sudo kubeadm init --apiserver-advertise-address=192.168.6.138 --pod-network-cidr=10.244.0.0/16
+sudo kubeadm init --apiserver-advertise-address=192.168.xxx.xxx --pod-network-cidr=10.244.0.0/16
 mkdir -p "$HOME/.kube"
 sudo cp -i /etc/kubernetes/admin.conf "$HOME/.kube/config"
 sudo chown "$(id -u):$(id -g)" "$HOME/.kube/config"
