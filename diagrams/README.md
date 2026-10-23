@@ -1,15 +1,15 @@
 # Architecture Diagrams
 
-These Mermaid diagrams describe the recorded lab design. The CNI changed over time, so Flannel is historical and later notes record Calico v3.33.0. Confirm the active cluster state before using a diagram as an as-built inventory.
+These Mermaid diagrams describe the recorded lab design. The CNI changed over time, so Flannel is historical and later notes record Calico v3.33.0. Confirm the active cluster state before using a diagram as an as-built inventory. LAN node addresses are intentionally masked.
 
 ## Full cluster
 
 ```mermaid
 flowchart TB
   Host["Windows 11"] --> VMware["VMware"]
-  VMware --> CP["k8s-master · 192.168.6.138"]
-  VMware --> W1["k8s-worker1 · 192.168.6.139"]
-  VMware --> W2["k8s-worker2 · 192.168.6.140"]
+  VMware --> CP["k8s-master · 192.168.xxx.xxx"]
+  VMware --> W1["k8s-worker1 · 192.168.xxx.xxx"]
+  VMware --> W2["k8s-worker2 · 192.168.xxx.xxx"]
   CP --> API["kube-apiserver :6443"]
   API --> ETCD["etcd"]
   API --> SCH["scheduler"]
@@ -56,7 +56,7 @@ This shows the iptables-based path observed in the lab. Chain names and dataplan
 
 ```mermaid
 flowchart TB
-  Client["LAN client"] --> VIP["External VIP from reserved pool"]
+  Client["LAN client"] --> VIP["External VIP from a reserved private pool"]
   VIP --> L2["MetalLB speaker / L2 advertisement"]
   L2 --> Node["Node receiving traffic"]
   Node --> Svc["Kubernetes Service dataplane"]
