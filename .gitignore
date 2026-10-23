@@ -1,0 +1,8 @@
+*.swp
+*.tmp
+.env
+*.kubeconfig
+kubeconfig
+admin.conf
+*.key
+*.pem
