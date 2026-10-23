@@ -4,11 +4,11 @@
 
 This lab has three distinct address scopes:
 
-- **Node network:** recorded as `192.168.6.0/24`; master `.138`, worker1 `.139`, worker2 `.140`. Notion says these were DHCP-assigned.
+- **Node network:** LAN addresses are masked as `192.168.xxx.xxx`; the lab uses a `/24` network. Notion says node addresses were DHCP-assigned.
 - **Pod network:** `10.244.0.0/16` was configured at kubeadm init. Pod IPs are assigned by the CNI/IPAM design and are not the node addresses.
 - **Service network:** ClusterIP addresses are virtual Service addresses and are not ordinary Pod addresses.
 
-Do not assume the example Pod IPs or Service IPs are stable after resources are recreated.
+Do not assume example Pod IPs or Service IPs are stable after resources are recreated.
 
 ## CNI responsibilities
 
@@ -46,7 +46,7 @@ ip route
 ip -br addr
 ```
 
-Notion recorded a successful cross-node test from a BusyBox Pod on worker1 (`10.244.1.46`) to a worker2 Pod (`10.244.2.10`) with three replies received. Treat those IPs as the historical test result only.
+The Notion notes record a successful cross-node test from a BusyBox Pod on worker1 to a worker2 Pod, with three replies received. Pod IPs are omitted because they are ephemeral examples.
 
 ## Kubernetes DNS
 
