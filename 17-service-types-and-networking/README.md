@@ -13,10 +13,10 @@
 - Traced `KUBE-NODEPORTS`, `KUBE-EXT-*`, `KUBE-SVC-*` and `KUBE-SEP-*` to endpoint DNAT.
 - Verified cross-node NodePort traffic with `externalTrafficPolicy: Cluster`.
 - Installed MetalLB v0.15.3 in Layer 2 mode.
-- Configured pool `192.168.6.200-192.168.6.210` with an `IPAddressPool` and `L2Advertisement`.
-- Verified a LoadBalancer Service received `192.168.6.200`, with a NodePort allocated as well.
+- Configured an `IPAddressPool` and `L2Advertisement`; the actual private LAN address range is masked in this public repository.
+- Verified a LoadBalancer Service received an external address, with a NodePort allocated as well.
 
-Treat those addresses and generated chain names as historical observations; they can differ in the current cluster.
+Treat addresses and generated chain names as historical observations; they can differ in the current cluster.
 
 ## Traffic diagrams
 
@@ -47,7 +47,7 @@ kubectl get svc -A -o wide
 kubectl get endpointslice -A
 kubectl get pods -n metallb-system -o wide
 kubectl get ipaddresspools,l2advertisements -n metallb-system
-kubectl describe svc svc-lb-test-service
+kubectl describe svc <service-name>
 sudo iptables -t nat -L KUBE-NODEPORTS -n -v
 ip neigh show
 ```
@@ -58,18 +58,17 @@ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.15.3/confi
 kubectl get pods -n metallb-system
 ```
 
-The repository includes [metallb-l2-pool.yaml](../manifests/metallb-l2-pool.yaml). It uses the historical pool `192.168.6.200-192.168.6.210`; check that these IPs are reserved and unused before applying. Apply only after MetalLB CRDs exist:
+The repository includes [metallb-l2-pool.yaml](../manifests/metallb-l2-pool.yaml). Its address range is intentionally masked as `192.168.xxx.xxx-192.168.xxx.xxx`, which is a placeholder and **not valid for applying**. Replace it with a valid, reserved private LAN range excluded from DHCP before use. Apply only after MetalLB CRDs exist:
 ```bash
 kubectl apply -f manifests/metallb-l2-pool.yaml
 kubectl get ipaddresspools,l2advertisements -n metallb-system
 ```
 
-The lab converted an existing test Service to LoadBalancer with:
+Convert a test Service to LoadBalancer with:
 ```bash
-kubectl patch svc svc-lb-test-service -p '{"spec":{"type":"LoadBalancer"}}'
-kubectl get svc svc-lb-test-service -w
+kubectl patch svc <service-name> -p '{"spec":{"type":"LoadBalancer"}}'
+kubectl get svc <service-name> -w
 ```
-Use the actual Service name in your cluster, not the historical name blindly.
 
 Kube-proxy mode and chains depend on cluster configuration. Do not assume iptables chain names exist in clusters using another dataplane or proxy mode.
 
