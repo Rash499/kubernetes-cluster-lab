@@ -31,11 +31,11 @@ This repository was audited against the connected Notion Kubernetes lab pages av
 
 ## Accuracy and safety notes
 
-- The Notion setup says node addresses are DHCP-assigned; they were not configured as static IPs in that record.
+- The Notion setup says node addresses are DHCP-assigned; they were not configured as static IPs in that record. Private LAN addresses have been masked in this public repository as `192.168.xxx.xxx`.
 - The early CNI was Flannel. Later notes describe a migration to Calico v3.33.0. Verify the current active CNI before changing anything.
 - The cluster versions recorded were Kubernetes v1.34.12 and containerd 1.7.24.
-- The Service deep dive records MetalLB v0.15.3, an IP pool of 192.168.6.200–192.168.6.210, and example external IP 192.168.6.200. Confirm the range is still reserved and unused before applying it.
+- The Service deep dive records MetalLB v0.15.3 and an example external address range. The actual addresses are intentionally masked; choose and verify a valid range reserved for the lab and excluded from DHCP before applying.
 - The HPA notes identify Metrics Server as the source for the Kubernetes Metrics API used by `kubectl top` and standard resource-metric HPA; Prometheus is a separate monitoring path.
-- YAML and Helm examples in this repository are learning templates, not proof that every object remains deployed or that every example is production-ready.
+- YAML and Helm examples in this repository are learning templates, not proof that every object remains deployed or that every example is production-ready. Masked IP placeholders are not valid configuration values and must be replaced locally before running.
 - Ansible worker automation is documented as a workflow to verify rather than a completed result.
 - Never publish credentials, private SSH keys, kubeconfig files, join tokens or unredacted Secret output.
