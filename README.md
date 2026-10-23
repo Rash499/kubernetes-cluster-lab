@@ -7,9 +7,9 @@ A hands-on Kubernetes administration lab built on VMware with three Debian 13 vi
 ```mermaid
 flowchart TB
     Host["Windows 11 host"] --> VMware["VMware"]
-    VMware --> M["Debian 13 · k8s-master<br/>192.168.6.138"]
-    VMware --> W1["Debian 13 · k8s-worker1<br/>192.168.6.139"]
-    VMware --> W2["Debian 13 · k8s-worker2<br/>192.168.6.140"]
+    VMware --> M["Debian 13 · k8s-master<br/>192.168.xxx.xxx"]
+    VMware --> W1["Debian 13 · k8s-worker1<br/>192.168.xxx.xxx"]
+    VMware --> W2["Debian 13 · k8s-worker2<br/>192.168.xxx.xxx"]
     M --> API["kube-apiserver :6443"]
     API --> ETCD["etcd"]
     API --> SCH["kube-scheduler"]
@@ -32,11 +32,11 @@ flowchart TB
 
 | Node | Recorded address | Role |
 |---|---|---|
-| `k8s-master` | `192.168.6.138` | Control plane |
-| `k8s-worker1` | `192.168.6.139` | Worker |
-| `k8s-worker2` | `192.168.6.140` | Worker |
+| `k8s-master` | `192.168.xxx.xxx` | Control plane |
+| `k8s-worker1` | `192.168.xxx.xxx` | Worker |
+| `k8s-worker2` | `192.168.xxx.xxx` | Worker |
 
-Recorded settings: network `192.168.6.0/24`, gateway/DNS `192.168.6.2`, interface `ens33`, Kubernetes `v1.34.12`, containerd `1.7.24`, Pod CIDR `10.244.0.0/16`. The Notion notes say node addresses are DHCP-assigned, not statically configured.
+Recorded settings: LAN network `192.168.xxx.xxx/24`, gateway/DNS `192.168.xxx.xxx`, interface `ens33`, Kubernetes `v1.34.12`, containerd `1.7.24`, Pod CIDR `10.244.0.0/16`. LAN addresses have been masked for privacy; replace placeholders with your own values before running commands.
 
 ## Documentation index
 
@@ -91,13 +91,13 @@ Recorded settings: network `192.168.6.0/24`, gateway/DNS `192.168.6.2`, interfac
 
 Start with [manifests/README.md](manifests/README.md). Examples cover Deployments, Services, ConfigMaps, a Secret template, restricted Pod settings, PV/PVC, NetworkPolicy, RBAC, Ingress, probes, HPA, resource limits, PrometheusRule, StatefulSet, DaemonSet, Job/CronJob and scheduling tolerations. A minimal Helm chart lives in [charts/web-demo](charts/web-demo/Chart.yaml).
 
-**Do not apply every file at once.** Some manifests require CRDs, a specific CNI, Metrics Server, a Prometheus Operator, a default StorageClass, an Ingress Controller, MetalLB, a node label/taint, or a prepared local storage path. Read the manifest README and each file's comments first.
+**Do not apply every file at once.** Some manifests require CRDs, a specific CNI, Metrics Server, a Prometheus Operator, a default StorageClass, an Ingress Controller, MetalLB, a node label/taint, or a prepared local storage path. Read the manifest README and each file's comments first. IP placeholders in examples must be replaced with valid addresses before applying.
 
 ## Accuracy and safety
 
 - The early CNI was Flannel. Later notes describe a migration to Calico v3.33.0. Verify the active CNI before changing anything; do not install both based only on this history.
-- MetalLB pool `192.168.6.200-192.168.6.210` and service IPs are recorded lab values. Confirm they remain reserved and unused before reusing.
-- Notion records node addresses as DHCP, not static.
+- The MetalLB address range has been masked. Choose a range reserved for the lab and excluded from DHCP before applying the example.
+- LAN addresses are masked in this public repository.
 - Ansible is documented as a workflow to verify, not a claim that all worker configuration was successfully automated.
 - Lab YAML files are educational templates, not proof every object remains deployed.
 - Never commit kubeconfig files, join tokens, private SSH keys, passwords or real Secret values.
