@@ -1,6 +1,6 @@
 # Kubernetes YAML Manifest Examples
 
-This directory contains educational manifests distilled from the lab and additional small examples to make the concepts reproducible. These are templates to review and adapt, not a claim that every object is currently applied in the live cluster.
+This directory contains educational manifests distilled from the lab and additional small examples to make concepts reproducible. These are templates to review and adapt, not a claim that every object is currently applied in the live cluster.
 
 ## Important: do not apply the entire directory
 
@@ -15,7 +15,7 @@ Some manifests depend on optional controllers or cluster-specific resources. `ku
 | `nginx-service.yaml` | ClusterIP front end for Nginx | Requires matching Deployment labels |
 | `app-configmap.yaml` | Non-sensitive environment configuration | Namespace must exist |
 | `secret-template.yaml` | Secret format template with placeholders | Never commit real values |
-| `restricted-pod.yaml` | Non-root container, seccomp, dropped capabilities, read-only root FS | Image/runtime security compatibility may vary |
+| `restricted-pod.yaml` | Non-root container, seccomp, dropped capabilities, read-only root FS | Image/runtime compatibility may vary |
 | `storage-pv-pvc.yaml` | Node-local PV and PVC | Requires correct worker path and matching node name |
 | `networkpolicy.yaml` | Restricts Nginx ingress to labelled clients | Requires a CNI that enforces NetworkPolicy |
 | `rbac-readonly.yaml` | Namespace-scoped Pod read-only RBAC | Impersonation checks require permission |
@@ -28,6 +28,7 @@ Some manifests depend on optional controllers or cluster-specific resources. `ku
 | `daemonset-demo.yaml` | One simple agent Pod per eligible node | Scheduling depends on node taints |
 | `job-cronjob-demo.yaml` | Finite Job and scheduled CronJob | CronJob repeats every 15 minutes until deleted/suspended |
 | `toleration-demo.yaml` | Node selector plus matching toleration | Requires matching worker1 taint and hostname label |
+| `metallb-l2-pool.yaml` | MetalLB IPAddressPool and L2Advertisement | Requires MetalLB CRDs; reserve the address range first |
 
 A minimal Helm chart is in [`charts/web-demo`](../charts/web-demo/Chart.yaml), not in this directory.
 
