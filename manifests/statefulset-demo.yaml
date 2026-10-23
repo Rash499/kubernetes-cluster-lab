@@ -1,0 +1,49 @@
+# Requires a default/dynamic StorageClass that can provision PVCs.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-headless
+  namespace: k8s-demo
+spec:
+  clusterIP: None
+  selector:
+    app: stateful-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: stateful-web
+  namespace: k8s-demo
+spec:
+  serviceName: web-headless
+  replicas: 2
+  selector:
+    matchLabels:
+      app: stateful-web
+  template:
+    metadata:
+      labels:
+        app: stateful-web
+    spec:
+      containers:
+        - name: web
+          image: nginx:1.28
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+            - name: web-data
+              mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+    - metadata:
+        name: web-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
