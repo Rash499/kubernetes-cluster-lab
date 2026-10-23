@@ -18,6 +18,7 @@ Some manifests depend on optional controllers or cluster-specific resources. `ku
 | `restricted-pod.yaml` | Non-root container, seccomp, dropped capabilities, read-only root FS | Image/runtime compatibility may vary |
 | `storage-pv-pvc.yaml` | Node-local PV and PVC | Requires correct worker path and matching node name |
 | `networkpolicy.yaml` | Restricts Nginx ingress to labelled clients | Requires a CNI that enforces NetworkPolicy |
+| `networkpolicy-isolation.yaml` | Default-deny ingress plus explicit allow-list | Use only in a dedicated test namespace |
 | `rbac-readonly.yaml` | Namespace-scoped Pod read-only RBAC | Impersonation checks require permission |
 | `ingress.yaml` | Host-based HTTP routing | Requires Ingress Controller and DNS/hosts entry |
 | `hpa-demo.yaml`, `hpa.yaml` | Demo Deployment/Service and CPU HPA | Metrics Server and Metrics API must work |
