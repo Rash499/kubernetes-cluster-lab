@@ -1,5 +1,5 @@
-# CAUTION: only use an IP range reserved for this cluster and excluded from DHCP.
-# Notion recorded 192.168.6.200-192.168.6.210; verify it is still unused before applying.
+# TEMPLATE ONLY: masked addresses are placeholders and are NOT valid for applying.
+# Replace with a reserved LAN range excluded from DHCP before using this manifest.
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
@@ -7,7 +7,7 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-    - 192.168.6.200-192.168.6.210
+    - 192.168.xxx.xxx-192.168.xxx.xxx
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
