@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-demo
+  namespace: k8s-demo
+spec:
+  backoffLimit: 2
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app: job-demo
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: task
+          image: busybox:1.36.1
+          command: ["sh", "-c", "echo 'Kubernetes Job completed'; date"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 32Mi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-demo
+  namespace: k8s-demo
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: task
+              image: busybox:1.36.1
+              command: ["sh", "-c", "echo 'Scheduled Kubernetes task'; date"]
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 32Mi
