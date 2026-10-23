@@ -14,11 +14,9 @@ spec:
     seccompProfile:
       type: RuntimeDefault
   containers:
-    - name: web
-      image: nginxinc/nginx-unprivileged:1.28
-      ports:
-        - name: http
-          containerPort: 8080
+    - name: diagnostic
+      image: busybox:1.36.1
+      command: ["sh", "-c", "sleep 3600"]
       securityContext:
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
@@ -27,8 +25,8 @@ spec:
             - ALL
       resources:
         requests:
-          cpu: 25m
-          memory: 32Mi
+          cpu: 10m
+          memory: 16Mi
         limits:
-          cpu: 200m
-          memory: 96Mi
+          cpu: 100m
+          memory: 32Mi
