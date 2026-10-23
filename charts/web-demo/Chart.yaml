@@ -1,0 +1,6 @@
+apiVersion: v2
+name: web-demo
+description: A small learning chart for the Kubernetes cluster lab
+type: application
+version: 0.1.0
+appVersion: "1.28"
