@@ -7,18 +7,18 @@ VMware hosts three Debian 13 VMs. The control plane manages the cluster; worker 
 ```mermaid
 flowchart TB
   H["Windows 11"] --> V["VMware"]
-  V --> M["k8s-master · 192.168.6.138"]
-  V --> W1["k8s-worker1 · 192.168.6.139"]
-  V --> W2["k8s-worker2 · 192.168.6.140"]
+  V --> M["k8s-master · 192.168.xxx.xxx"]
+  V --> W1["k8s-worker1 · 192.168.xxx.xxx"]
+  V --> W2["k8s-worker2 · 192.168.xxx.xxx"]
 ```
 
 | Node | Address | Role |
 |---|---|---|
-| k8s-master | 192.168.6.138 | Control plane |
-| k8s-worker1 | 192.168.6.139 | Worker |
-| k8s-worker2 | 192.168.6.140 | Worker |
+| k8s-master | 192.168.xxx.xxx | Control plane |
+| k8s-worker1 | 192.168.xxx.xxx | Worker |
+| k8s-worker2 | 192.168.xxx.xxx | Worker |
 
-Notes record network 192.168.6.0/24, gateway/DNS 192.168.6.2, interface ens33. One Notion entry says the addresses were DHCP-assigned; verify before calling them static.
+LAN network and gateway/DNS addresses are masked as `192.168.xxx.xxx`; interface is `ens33`. One Notion entry says addresses were DHCP-assigned; verify before calling them static.
 
 ## Implementation / checks
 ```bash
@@ -27,14 +27,14 @@ ip -br address
 ip route
 cat /etc/resolv.conf
 getent hosts k8s-master k8s-worker1 k8s-worker2
-ping -c 3 192.168.6.139
+ping -c 3 192.168.xxx.xxx
 ```
 
-Example /etc/hosts mappings:
+Example `/etc/hosts` mappings (replace placeholders with each VM's actual address):
 ```text
-192.168.6.138 k8s-master
-192.168.6.139 k8s-worker1
-192.168.6.140 k8s-worker2
+192.168.xxx.xxx k8s-master
+192.168.xxx.xxx k8s-worker1
+192.168.xxx.xxx k8s-worker2
 ```
 
 ## Troubleshooting
