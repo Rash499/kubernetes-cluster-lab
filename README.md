@@ -38,6 +38,11 @@ flowchart TB
 
 Recorded settings: LAN network `192.168.xxx.xxx/24`, gateway/DNS `192.168.xxx.xxx`, interface `ens33`, Kubernetes `v1.34.12`, containerd `1.7.24`, Pod CIDR `10.244.0.0/16`. LAN addresses have been masked for privacy; replace placeholders with your own values before running commands.
 
+## Complete guide and configuration cookbook
+
+- [Configuration Cookbook](docs/CONFIGURATION_COOKBOOK.md) — node preparation, containerd, Kubernetes installation, kubeadm initialization, CNI checks, workload troubleshooting, ConfigMaps/Secrets, storage, Ingress, Helm, monitoring, RBAC and NetworkPolicy commands.
+- Source reference: the supplied *Kubernetes Cluster on VMware — Complete Lab Guide, Topics 1–61* PDF was used to organize this cookbook. The repository's numbered topic guides and manifests remain the detailed, browsable implementation examples.
+
 ## Documentation index
 
 | Directory | Topics |
